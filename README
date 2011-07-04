@@ -1,0 +1,25 @@
+##############HYPEME BATCH DOWNLOADER##############
+Hypme.py is a Python script to bulk download songs from hype machine.
+
+
+Steps to use:
+
+1 - Make sure you have Python installed.
+
+2- Make sure you have Sqlite3 installed.
+
+3- Create a sqlite3 table:
+
+	3.1 example: "$ sqlite3 songs.db "CREATE TABLE songs (id INTEGER PRIMARY KEY AUTOINCREMENT, key TEXT);"
+
+Note: 1 & 2 should be out of the box on a Mac.
+
+3 - Open hypeme.py and change the following:
+
+AREA_TO_SCRAPE: Set this variable to what you'd like to scrape. i.e. popular or a username.
+
+NUMBER_OF_PAGES: Number of pages to scrape. For initial download you can set this number really high and later just cron job the script set to 1.
+
+FOLDER: Set this to the folder you'd like to store the songs to.
+
+DB_FILE: Set this to the database file you've made earlier.
