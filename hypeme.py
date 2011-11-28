@@ -94,7 +94,12 @@ class HypeScraper:
 		os.chdir(FOLDER)
 		request = urllib2.Request(song.url)
 		request.add_header('cookie', self.current_cookie)
-		response = urllib2.urlopen(request)
+		try:
+     			response = urllib2.urlopen(request)
+		except urllib2.HTTPError  as e:
+      			print "Error downloading song: ", song
+			print(e.code)
+			return False
 		#grab the data
 		song_data = response.read()
 		try:
