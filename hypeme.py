@@ -24,11 +24,15 @@ import sqlite3
 import os
 from collections import deque
 
+#Uncomment line below if you'd like to scrape you're favourites
+#AREA_TO_SCRAPE = 'fzakaria'
 AREA_TO_SCRAPE = 'popular'
 NUMBER_OF_PAGES = 3
 DB_FILE = 'songs.db'
-DEBUG = True
+DEBUG = False
 FOLDER = 'C:/Development/HypeScript/Test'
+#Replace with the line below if using a Mac for example
+#FOLDER = '/Users/fzakaria/Music/HypeMachine/'
 
 class HypeSong:
 	def __init__(self, id , key, title, artist):
