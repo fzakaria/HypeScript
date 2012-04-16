@@ -24,11 +24,11 @@ import sqlite3
 import os
 from collections import deque
 
-AREA_TO_SCRAPE = 'fzakaria'
+AREA_TO_SCRAPE = 'popular'
 NUMBER_OF_PAGES = 3
 DB_FILE = 'songs.db'
-DEBUG = False
-FOLDER = '/Users/fzakaria/Music/HypeMachine/'
+DEBUG = True
+FOLDER = 'C:/Development/HypeScript/Test'
 
 class HypeSong:
 	def __init__(self, id , key, title, artist):
@@ -125,7 +125,7 @@ class HypeScraper:
 		return False
 		
 	def parse_html(self, html_contents):
-		idMatches = re.findall("(?<=\tid:\')\w*(?=\')", html_contents)
+		idMatches = re.findall("[ \t]id:\'(\w*)(?=\')", html_contents)
 		keyMatches = re.findall("(?<=\tkey: \')\w*(?=\')", html_contents)
 		songMatches= re.findall("(?<=\tsong:\').*(?=\')", html_contents)
 		artistMatches= re.findall("(?<=\tartist:\').*(?=\')", html_contents)
@@ -137,6 +137,9 @@ class HypeScraper:
 			artist = artistMatches[i]		
 			song = HypeSong(id, key, title, artist)
 			self.songs.append(song)
+
+		if DEBUG:
+			print "Found " , len(self.songs) , " songs."
 			
 			
 
