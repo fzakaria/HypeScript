@@ -30,7 +30,7 @@ AREA_TO_SCRAPE = 'popular'
 NUMBER_OF_PAGES = 3
 DB_FILE = 'songs.db'
 DEBUG = False
-FOLDER = 'C:/Development/HypeScript/Test'
+FOLDER = 'D:/Development/HypeScript/Test'
 #Replace with the line below if using a Mac for example
 #FOLDER = '/Users/fzakaria/Music/HypeMachine/'
 
@@ -129,11 +129,14 @@ class HypeScraper:
 		return False
 		
 	def parse_html(self, html_contents):
-		idMatches = re.findall("[ \t]id:\'(\w*)(?=\')", html_contents)
-		keyMatches = re.findall("(?<=\tkey: \')\w*(?=\')", html_contents)
-		songMatches= re.findall("(?<=\tsong:\').*(?=\')", html_contents)
-		artistMatches= re.findall("(?<=\tartist:\').*(?=\')", html_contents)
+		idMatches = re.findall("\s+id:\s*\'(.+)\'", html_contents)
+		keyMatches = re.findall("\s+key:\s*\'(.+)\'", html_contents)
+		songMatches = re.findall("\s+song:\s*\'(.+)\'", html_contents)
+		artistMatches = re.findall("\s+artist:\s*\'(.+)\'", html_contents)
 		
+		if len(idMatches) != len(keyMatches) != len(songMatches) != len(artistMatches):
+			print "Error scraping the page for id, song, key, artist"
+
 		for i in range( len(idMatches) ):
 			id = idMatches[i]
 			key = keyMatches[i]
