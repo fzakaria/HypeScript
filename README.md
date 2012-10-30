@@ -16,10 +16,10 @@ how to deploy with dependencies yet
 
 3. Open hypeme.py and change modify the script to your choosing!
 
-AREA_TO_SCRAPE: Set this variable to what you'd like to scrape. i.e. popular or a username.
+    AREA_TO_SCRAPE: Set this variable to what you'd like to scrape. i.e. popular or a username.
 
-NUMBER_OF_PAGES: Number of pages to scrape. For initial download you can set this number really high and later just cron job the script set to 1.
+    NUMBER_OF_PAGES: Number of pages to scrape. For initial download you can set this number really high and later just cron job the script set to 1.
 
-FOLDER: Set this to the folder you'd like to store the songs to.
+    FOLDER: Set this to the folder you'd like to store the songs to.
 
 4. Launch the script `python hypeme.py`
