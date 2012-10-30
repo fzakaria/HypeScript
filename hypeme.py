@@ -16,148 +16,139 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 """
+from time import time
 import sys
 import urllib2
-import re
-import time
-import sqlite3
-import os
-from collections import deque
+import urllib
+from time import time
+from bs4 import BeautifulSoup
+import json
 
-#Uncomment line below if you'd like to scrape you're favourites
-#AREA_TO_SCRAPE = 'fzakaria'
+##############AREA_TO_SCRAPE################
+# This is the general area that you'd 
+# like to parse and scrape. 
+# ex. 'popular', 'latest', '<username>'
+############################################
 AREA_TO_SCRAPE = 'popular'
 NUMBER_OF_PAGES = 3
-DB_FILE = 'songs.db'
+
+#########FOLDER################################
+# The folder you'd like to store
+# your mp3s once downloaded.
+# ex. 'C:/Development/HypeScript/Test' or
+# '/Users/fzakaria/Music/HypeMachine/' on mac
+###############################################
+FOLDER = 'C:/Development/HypeScript/Test'
+
+###DO NOT MODIFY THESE UNLES YOU KNOW WHAT YOU ARE DOING####
 DEBUG = False
-FOLDER = 'D:/Development/HypeScript/Test'
-#Replace with the line below if using a Mac for example
-#FOLDER = '/Users/fzakaria/Music/HypeMachine/'
-
-class HypeSong:
-	def __init__(self, id , key, title, artist):
-		self.id = id
-		self.key = key
-		self.title = title
-		self.artist = artist
-		self.url = 'http://hypem.com/serve/play/' + id + '/' + key + ".mp3"
-		
-
-	def __str__(self):
-		return "("+self.key+", "+self.title+", "+self.artist+")"
+HYPEM_URL = 'http://hypem.com/{}'.format(AREA_TO_SCRAPE)
 
 
 class HypeScraper:
-	
-	def __init__(self):
-		self.url = 'http://hypem.com/'+AREA_TO_SCRAPE+'/'
-		self.songs = deque()
-		self.conn = sqlite3.connect(DB_FILE)
-		self.cursor = self.conn.cursor()
-		
-	def start(self):
-		for i in range(1, NUMBER_OF_PAGES + 1):
-			complete_url = self.url + "/" + str(i) + '?ax=1&ts='+ str(time.time())
-			request = urllib2.Request(complete_url)
-			response = urllib2.urlopen(request)
-			#save our cookie
-			self.current_cookie = response.headers.get('Set-Cookie')
-			#grab the HTML
-			html_data = response.read()
-		
-			if DEBUG:
-				html_file = open("hypeHTML.html", "w")
-				html_file.write(html_data)
-				html_file.close()
-				
-			self.parse_html(html_data)
-			
-			self.download_songs()
-				
-	
-	def download_songs(self):
-	
-		while len( self.songs ) > 0:
-			current_song = self.songs.popleft()
-			
-			print "Attempting to download ", current_song
-			
-			if self.song_exists( current_song ):
-				print "\tSong existed!"
-				continue	
-			
-			#download song
-			print "\tDownloading song..."
-			if (self.download_song(current_song) ):
-				print "\tInserted song into db"
-				self.insert_song(current_song)
-			
-		
-			
-	def download_song(self, song):
-		os.chdir(FOLDER)
-		request = urllib2.Request(song.url)
-		request.add_header('cookie', self.current_cookie)
-		try:
-     			response = urllib2.urlopen(request)
-		except urllib2.HTTPError  as e:
-      			print "Error downloading song: ", song
-			print(e.code)
-			return False
-		#grab the data
-		song_data = response.read()
-		try:
-			mp3_song = open(song.title+".mp3", "wb")
-			mp3_song.write(song_data)
-			mp3_song.close()
-		except Exception as e:
-			print "Error downloading song: ", song
-			return False
-		time.sleep(1) #sleep so we aren't booted
-		return True
-	
-	def insert_song(self, song):
-		t = (None, song.id)
-		self.cursor.execute("insert into songs values (?, ?)", t)
-		self.conn.commit()
-		
-	def song_exists(self, song):
-		t = (song.id, )
-		self.cursor.execute("select * from songs where key=?", t)
-		if len(self.cursor.fetchall()) > 0:
-			return True
-		return False
-		
-	def parse_html(self, html_contents):
-		idMatches = re.findall("\s+id:\s*\'(.+)\'", html_contents)
-		keyMatches = re.findall("\s+key:\s*\'(.+)\'", html_contents)
-		songMatches = re.findall("\s+song:\s*\'(.+)\'", html_contents)
-		artistMatches = re.findall("\s+artist:\s*\'(.+)\'", html_contents)
-		
-		if len(idMatches) != len(keyMatches) != len(songMatches) != len(artistMatches):
-			print "Error scraping the page for id, song, key, artist"
+  
+  def __init__(self):
+    pass
+    
+  def start(self):
+    print "--------STARTING DOWNLOAD--------"
+    print "\tURL : {} ".format(HYPEM_URL)
+    print "\tPAGES: {}".format(NUMBER_OF_PAGES)
+    
+    for i in range(1, NUMBER_OF_PAGES + 1):
+    
+      print "PARSING PAGE: {}".format(i)
+    
+      page_url = HYPEM_URL + "/{}".format(i)
+      html, cookie = self.get_html_file(page_url)
 
-		for i in range( len(idMatches) ):
-			id = idMatches[i]
-			key = keyMatches[i]
-			title = songMatches[i]
-			artist = artistMatches[i]		
-			song = HypeSong(id, key, title, artist)
-			self.songs.append(song)
-
-		if DEBUG:
-			print "Found " , len(self.songs) , " songs."
-			
-			
+      if DEBUG:
+        html_file = open("hypeHTML.html", "w")
+        html_file.write(html)
+        html_file.close()
+        
+      tracks = self.parse_html(html)
+      
+      print "\tPARSED {} SONGS".format(len(tracks) )
+      
+      self.download_songs(tracks, cookie)
+      
+      
+  def get_html_file(self, url):
+    data = {'ax':1 ,
+              'ts': time()
+          }
+    data_encoded = urllib.urlencode(data)
+    complete_url = url + "?{}".format(data_encoded)
+    request = urllib2.Request(complete_url)
+    response = urllib2.urlopen(request)
+    #save our cookie
+    cookie = response.headers.get('Set-Cookie')
+    #grab the HTML
+    html = response.read()
+    response.close()
+    return html, cookie
+    
+  def parse_html(self, html):
+    track_list = []
+    soup = BeautifulSoup(html)
+    html_tracks = soup.find(id="displayList-data")
+    if html_tracks is None:
+      return track_list
+    try:
+      track_list = json.loads(html_tracks.text)
+      return track_list[u'tracks']
+    except ValueError:
+      print "Hypemachine contained invalid JSON."
+      return track_list
+      
+  #tracks have id, title, artist, key
+  def download_songs(self, tracks, cookie):
+  
+    print "\tDOWNLOADING SONGS..."
+    for track in tracks:
+    
+      key = track[u"key"]
+      id = track[u"id"]
+      artist = track[u"artist"]
+      title = track[u"song"]
+      type = track[u"type"]
+      
+      print "\tFETCHING SONG...."
+      print "\t{} by {}".format(title, artist)
+      
+      if type is False:
+        continue
+       
+      try:
+        serve_url = "http://hypem.com/serve/source/{}/{}".format(id, key)
+        request = urllib2.Request(serve_url, "" , {'Content-Type': 'application/json'})
+        request.add_header('cookie', cookie)
+        response = urllib2.urlopen(request)
+        song_data_json = response.read()
+        response.close()
+        song_data = json.loads(song_data_json)
+        url = song_data[u"url"]
+        
+        download_response = urllib2.urlopen(url)
+        filename = "{}.mp3".format(title)
+        mp3_song_file = open(filename, "wb")
+        mp3_song_file.write(download_response.read() )
+        mp3_song_file.close()
+      except urllib2.HTTPError, e:
+            print 'HTTPError = ' + str(e.code) + " trying hypem download url."
+      except urllib2.URLError, e:
+            print 'URLError = ' + str(e.reason)  + " trying hypem download url."
+      except Exception, e:
+            print 'generic exception: ' + str(e)
+      
+  
+     
 
 def main():
-	scraper = HypeScraper()
-	scraper.start()
-	scraper.conn.close()
-		
-		
-		
-		
+  scraper = HypeScraper()
+  scraper.start()
+       
 if __name__ == "__main__":
     main()
-		
+    
