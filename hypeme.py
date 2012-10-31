@@ -16,6 +16,8 @@ You should have received a copy of the GNU Lesser General Public
 License along with this library; if not, write to the Free Software
 Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
 """
+
+import unicodedata
 from time import time
 import sys
 import urllib2
@@ -23,14 +25,16 @@ import urllib
 from time import time
 from bs4 import BeautifulSoup
 import json
+import string
 
 ##############AREA_TO_SCRAPE################
 # This is the general area that you'd 
 # like to parse and scrape. 
-# ex. 'popular', 'latest', '<username>'
+# ex. 'popular', 'latest', '<username>' or
+# 'track/<id>'
 ############################################
-AREA_TO_SCRAPE = 'popular'
-NUMBER_OF_PAGES = 3
+AREA_TO_SCRAPE = 'track/1q6rv'
+NUMBER_OF_PAGES = 1
 
 #########FOLDER################################
 # The folder you'd like to store
@@ -43,6 +47,13 @@ FOLDER = 'C:/Development/HypeScript/Test'
 ###DO NOT MODIFY THESE UNLES YOU KNOW WHAT YOU ARE DOING####
 DEBUG = False
 HYPEM_URL = 'http://hypem.com/{}'.format(AREA_TO_SCRAPE)
+
+
+validFilenameChars = "-_.() %s%s" % (string.ascii_letters, string.digits)
+
+def removeDisallowedFilenameChars(filename):
+    cleanedFilename = unicodedata.normalize('NFKD', filename).encode('ASCII', 'ignore')
+    return ''.join(c for c in cleanedFilename if c in validFilenameChars)
 
 
 class HypeScraper:
@@ -131,7 +142,7 @@ class HypeScraper:
         url = song_data[u"url"]
         
         download_response = urllib2.urlopen(url)
-        filename = "{}.mp3".format(title)
+        filename = removeDisallowedFilenameChars(u"{}.mp3".format(title))
         mp3_song_file = open(filename, "wb")
         mp3_song_file.write(download_response.read() )
         mp3_song_file.close()
