@@ -20,6 +20,5 @@ how to deploy with dependencies yet
 
     NUMBER_OF_PAGES: Number of pages to scrape. For initial download you can set this number really high and later just cron job the script set to 1.
 
-    FOLDER: Set this to the folder you'd like to store the songs to.
 
 4. Launch the script `python hypeme.py`
