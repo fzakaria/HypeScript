@@ -36,14 +36,6 @@ import string
 AREA_TO_SCRAPE = 'popular'
 NUMBER_OF_PAGES = 3
 
-#########FOLDER################################
-# The folder you'd like to store
-# your mp3s once downloaded.
-# ex. 'C:/Development/HypeScript/Test' or
-# '/Users/fzakaria/Music/HypeMachine/' on mac
-###############################################
-FOLDER = 'C:/Development/HypeScript/Test'
-
 ###DO NOT MODIFY THESE UNLES YOU KNOW WHAT YOU ARE DOING####
 DEBUG = False
 HYPEM_URL = 'http://hypem.com/{}'.format(AREA_TO_SCRAPE)
