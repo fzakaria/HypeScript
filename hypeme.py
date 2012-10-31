@@ -33,8 +33,8 @@ import string
 # ex. 'popular', 'latest', '<username>' or
 # 'track/<id>'
 ############################################
-AREA_TO_SCRAPE = 'track/1qpnf//'
-NUMBER_OF_PAGES = 1
+AREA_TO_SCRAPE = 'popular'
+NUMBER_OF_PAGES = 3
 
 #########FOLDER################################
 # The folder you'd like to store
