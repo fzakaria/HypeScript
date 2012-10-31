@@ -33,7 +33,7 @@ import string
 # ex. 'popular', 'latest', '<username>' or
 # 'track/<id>'
 ############################################
-AREA_TO_SCRAPE = 'track/1q6rv'
+AREA_TO_SCRAPE = 'track/1qpnf//'
 NUMBER_OF_PAGES = 1
 
 #########FOLDER################################
@@ -121,12 +121,13 @@ class HypeScraper:
     
       key = track[u"key"]
       id = track[u"id"]
-      artist = track[u"artist"]
-      title = track[u"song"]
+      artist = removeDisallowedFilenameChars(track[u"artist"])
+      title = removeDisallowedFilenameChars(track[u"song"])
       type = track[u"type"]
       
       print "\tFETCHING SONG...."
-      print "\t{} by {}".format(title, artist)
+      
+      print u"\t{} by {}".format(title, artist)
       
       if type is False:
         continue
@@ -142,7 +143,7 @@ class HypeScraper:
         url = song_data[u"url"]
         
         download_response = urllib2.urlopen(url)
-        filename = removeDisallowedFilenameChars(u"{}.mp3".format(title))
+        filename = "{}.mp3".format(title)
         mp3_song_file = open(filename, "wb")
         mp3_song_file.write(download_response.read() )
         mp3_song_file.close()
