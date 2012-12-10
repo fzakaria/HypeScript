@@ -135,7 +135,7 @@ class HypeScraper:
         url = song_data[u"url"]
         
         download_response = urllib2.urlopen(url)
-        filename = "{}.mp3".format(title)
+        filename = "{} - {}.mp3".format(artist, title)
         mp3_song_file = open(filename, "wb")
         mp3_song_file.write(download_response.read() )
         mp3_song_file.close()
