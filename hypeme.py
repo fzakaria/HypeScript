@@ -100,6 +100,8 @@ class HypeScraper:
       return track_list
     try:
       track_list = json.loads(html_tracks.text)
+      if DEBUG:
+        print json.dumps(track_list, sort_keys=True,indent=4, separators=(',', ': '))
       return track_list[u'tracks']
     except ValueError:
       print "Hypemachine contained invalid JSON."
