@@ -122,6 +122,7 @@ class HypeScraper:
       print u"\t{} by {}".format(title, artist)
       
       if type is False:
+        print "\tSKIPPING SONG SINCE NO LONGER AVAILABLE..."
         continue
        
       try:
