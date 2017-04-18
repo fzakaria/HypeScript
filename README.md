@@ -1,4 +1,4 @@
-#Hypemachine Python Downloader
+# Hypemachine Python Downloader
 hypme.py is a Python script to bulk download songs from [HypeMachine](http://hypem.com). The script is fairly
 simple to use.
 
@@ -7,7 +7,7 @@ I normally document all my investigations on my personal blog at [blog.fzakaria.
 appreciate all feedback, criticism and help!
 
 
-##How To Use
+## How To Use
 
 1. Make sure you have Python installed (2.7~)
 
