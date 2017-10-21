@@ -35,7 +35,7 @@ NUMBER_OF_PAGES = 3
 
 # DO NOT MODIFY THESE UNLES YOU KNOW WHAT YOU ARE DOING
 DEBUG = False
-HYPEM_URL = 'http://hypem.com/{}'.format(AREA_TO_SCRAPE)
+HYPEM_URL = 'https://hypem.com/{}'.format(AREA_TO_SCRAPE)
 
 
 validFilenameChars = '-_.() %s%s' % (string.ascii_letters, string.digits)
